@@ -7,6 +7,13 @@ import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
 const IG_URL = "https://instagram.com/<crzgar717>";
 const FORMSPREE = "https://formspree.io/f/mjkoljga";
 
+const res = await fetch(FORMSPREE, {
+  method: "POST",
+  headers: { Accept: "application/json" },
+  body: data,
+});
+
+
 
 // ----------------------------
 // Types & Data
@@ -68,7 +75,7 @@ export default function Home() {
 const [sending, setSending] = useState(false);
 const [result, setResult] = useState(null);
 
-async function handleSubmit(e) {
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault(); // stops page from refreshing
   setSending(true);
   setResult(null);

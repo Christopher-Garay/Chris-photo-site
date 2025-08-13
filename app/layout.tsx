@@ -1,7 +1,19 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <SpeedInsights />   {/* <- keep this so the “defined but never used” warning goes away */}
+      </body>
+    </html>
+  );
+}
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
