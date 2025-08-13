@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
+const IG_URL = "https://instagram.com/<crzgar717>";
+const IG_URL = "https://instagram.com/<crzgar717>?utm_source=website&utm_medium=nav&utm_campaign=header";
 
 // ----------------------------
 // Types & Data
@@ -281,14 +283,15 @@ export default function Home() {
                   <Mail className="h-4 w-4" aria-hidden />
                 </a>
                 <a
-                  href="https://instagram.com/yourhandle"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"
-                  aria-label="Instagram"
-                >
-                  <Instagram className="h-4 w-4" aria-hidden />
-                </a>
+  href={IG_URL}
+  target="_blank"
+  rel="noreferrer noopener"
+  className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"
+  aria-label="Instagram"
+>
+  <Instagram className="h-4 w-4" aria-hidden />
+</a>
+
                 <a href="tel:+15555551234" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800" aria-label="Phone">
                   <Smartphone className="h-4 w-4" aria-hidden />
                 </a>
