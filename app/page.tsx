@@ -17,13 +17,13 @@ type Photo = { src: string; w: number; h: number; title: string };
 const PHOTOS: Photo[] = [
   { src: "/images/01.jpg", w: 1600, h: 1067, title: "Coastal light" },
   { src: "/images/02.jpg", w: 1600, h: 1067, title: "Quiet strength" },
-  { src: "/images/03.jpg", w: 1600, h: 1067, title: "Soft mornings" },
-  { src: "/images/04.jpg", w: 1600, h: 1067, title: "Windswept" },
+  { src: "/images/03.jpg", w: 1600, h: 1067, title: "Style" },
+  { src: "/images/04.jpg", w: 1600, h: 1067, title: "Fun and Candid" },
   { src: "/images/05.jpg", w: 1600, h: 1067, title: "Golden hour" },
-  { src: "/images/06.jpg", w: 1600, h: 1067, title: "Lines & light" },
-  { src: "/images/07.jpg", w: 1600, h: 1067, title: "Still water" },
-  { src: "/images/08.jpg", w: 1600, h: 1067, title: "Open road" },
-  { src: "/images/09.jpg", w: 1600, h: 1067, title: "City hush" },
+  { src: "/images/06.jpg", w: 1600, h: 1067, title: "Pets" },
+  { src: "/images/07.jpg", w: 1600, h: 1067, title: "Events & Ceremonies" },
+  { src: "/images/08.jpg", w: 1600, h: 1067, title: "Outings" },
+  { src: "/images/09.jpg", w: 1600, h: 1067, title: "Nature & Landscapes" },
 ];
 
 // ----------------------------
@@ -136,21 +136,36 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-zinc-900/70 bg-white/90 dark:bg-zinc-900/80">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <Link href="/" aria-label="Home" className="flex items-center gap-3 font-semibold tracking-tight">
-            <Image
-              src="/brand/logo-white.png"
-              alt="Christopher Garay Logo"
-              width={140}
-              height={32}
-              priority
-            />
-          </Link>
+  <div className="relative h-[clamp(2.5rem,5vw,10rem)] w-[clamp(6rem,12vw,26rem)]">
+  {/* Light mode → solid black */}
+  <Image
+    src="/brand/logo-solid-black.png"
+    alt="Light & Garay Studio"
+    fill
+    className="object-contain dark:hidden"
+    priority
+  />
+  {/* Dark mode → neon white */}
+  <Image
+    src="/brand/logo-neon-white.png"
+    alt="Light & Garay Studio"
+    fill
+    className="object-contain hidden dark:block"
+    priority
+  />
+</div>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link href="#work" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Work</Link>
-            <Link href="#about" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">About</Link>
-            <Link href="#services" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Services</Link>
-            <Link href="#contact" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Contact</Link>
-          </nav>
+
+</Link>
+
+
+          <nav className="hidden md:flex items-center gap-6 text-[clamp(0.95rem,1.05vw,1.05rem)]">
+  <Link href="#work"   className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Work</Link>
+  <Link href="#about"  className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">About</Link>
+  <Link href="#services" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Services</Link>
+  <Link href="#contact"  className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-300 rounded">Contact</Link>
+</nav>
+
 
           <div className="flex items-center gap-3">
             <button
@@ -176,12 +191,14 @@ export default function Home() {
         <section className="relative">
           <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 items-center gap-10">
             <div>
-              <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
-                Timeless images,<br className="hidden md:block" /> clean, honest story.
-              </h1>
-              <p className="mt-5 text-zinc-600 dark:text-zinc-300 max-w-prose">
-                Natural light. Minimal editing. Real moments. Sessions tailored for couples, portraits, and brand stories.
-              </p>
+              <h1 className="font-semibold tracking-tight leading-tight text-[clamp(2rem,5vw,3.5rem)]">
+  Timeless images,<br className="hidden md:block" /> clean, honest story.
+</h1>
+
+              <p className="mt-5 text-zinc-600 dark:text-zinc-300 max-w-prose text-[clamp(1rem,1.3vw,1.125rem)]">
+  Natural light. Smart editing. Real moments. Sessions tailored for couples, portraits, and brand stories.
+</p>
+
               <div className="mt-8 flex gap-3">
                 <Link
                   href="#work"
@@ -273,7 +290,7 @@ export default function Home() {
               <h3 className="font-medium mb-2">Based in</h3>
               <p className="text-sm flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
                 <MapPin className="h-4 w-4" aria-hidden />
-                Monterey, CA • Available worldwide
+                Monterey, CA • Available Locally and in the Bay Area
               </p>
               <h3 className="font-medium mt-4 mb-2">Specialties</h3>
               <ul className="text-sm list-disc ml-5 space-y-1 text-zinc-700 dark:text-zinc-300">
@@ -293,7 +310,7 @@ export default function Home() {
               {
                 name: "Portrait Sessions",
                 desc:
-                  "Perfect for individuals who want to capture their true self — whether it’s for personal branding, a milestone, or just because. We’ll find your best angles, best light, and the mood that feels authentically you.",
+                  "Perfect for individuals who want to capture their true self, whether it’s for personal branding, a milestone, or just because. We’ll find your best angles, best light, and the mood that feels authentically you.",
               },
               {
                 name: "Couples & Engagement",
