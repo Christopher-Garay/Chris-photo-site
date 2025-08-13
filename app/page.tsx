@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
 const IG_URL = "https://instagram.com/<crzgar717>";
-const IG_URL = "https://instagram.com/<crzgar717>?utm_source=website&utm_medium=nav&utm_campaign=header";
 
 // ----------------------------
 // Types & Data
