@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
 const IG_URL = "https://instagram.com/<crzgar717>";
+const FORMSPREE = "https://formspree.io/f/mjkoljga";
+
 
 // ----------------------------
 // Types & Data
@@ -63,9 +65,37 @@ function useScrollLock(locked: boolean) {
 }
 
 export default function Home() {
-  const { dark, setDark } = useDarkMode();
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
+const [sending, setSending] = useState(false);
+const [result, setResult] = useState(null);
+
+async function handleSubmit(e) {
+  e.preventDefault(); // stops page from refreshing
+  setSending(true);
+  setResult(null);
+
+  const form = e.currentTarget;
+  const data = new FormData(form);
+
+  try {
+    const res = await fetch("https://formspree.io/f/mjkoljga", {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: data,
+    });
+
+    if (res.ok) {
+      form.reset();
+      setResult({ ok: true, msg: "Thanks! I’ll get back to you soon." });
+    } else {
+      setResult({ ok: false, msg: "Something went wrong. Try again." });
+    }
+  } catch {
+    setResult({ ok: false, msg: "Network error. Try again." });
+  } finally {
+    setSending(false);
+  }
+}
+
 
   useScrollLock(open);
 
@@ -296,7 +326,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <form onSubmit={(e) => e.preventDefault()} className="grid md:grid-cols-3 gap-4">
+            <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-4">
               <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Your name" name="name" />
               <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Email" name="email" />
               <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="What are you looking for?" name="subject" />
@@ -305,6 +335,16 @@ export default function Home() {
                 <p className="text-xs text-zinc-500">By submitting, you agree to be contacted by email.</p>
                 <button type="submit" className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm">Send</button>
               </div>
+              {result && (
+  <p
+    className={`md:col-span-3 text-sm ${
+      result.ok ? "text-green-600" : "text-red-600"
+    }`}
+  >
+    {result.msg}
+  </p>
+)}
+
             </form>
           </div>
         </section>
