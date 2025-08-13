@@ -75,6 +75,7 @@ export default function Home() {
 
   // contact form
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false); // ✅ for the checkmark state
   const [result, setResult] = useState<null | { ok: boolean; msg: string }>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -95,6 +96,8 @@ export default function Home() {
       if (res.ok) {
         form.reset();
         setResult({ ok: true, msg: "Thanks! I’ll get back to you soon." });
+        setSent(true);                     // show ✔ Sent!
+        setTimeout(() => setSent(false), 2000); // auto-reset after 2s
       } else {
         const json = await res.json().catch(() => ({}));
         setResult({ ok: false, msg: json?.errors?.[0]?.message || "Something went wrong. Try again." });
@@ -341,10 +344,26 @@ export default function Home() {
               <textarea className="md:col-span-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" rows={4} placeholder="Share a bit about your vision, dates, and location." name="message" required />
               <div className="md:col-span-3 flex items-center justify-between">
                 <p className="text-xs text-zinc-500">By submitting, you agree to be contacted by email.</p>
-                <button type="submit" disabled={sending} className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm disabled:opacity-60">{sending ? "Sending..." : "Send"}</button>
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className={`rounded-2xl px-4 py-2 text-sm disabled:opacity-60 transition-transform ${
+                    sent
+                      ? "bg-green-600 text-white scale-100"
+                      : "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  }`}
+                >
+                  {sent ? "✔ Sent!" : sending ? "Sending..." : "Send"}
+                </button>
               </div>
+
+              {/* Inline status message for extra clarity (optional) */}
               {result && (
-                <p className={`md:col-span-3 text-sm ${result.ok ? "text-green-600" : "text-red-600"}`} role="status">
+                <p
+                  className={`md:col-span-3 text-sm ${result.ok ? "text-green-600" : "text-red-600"}`}
+                  role="status"
+                  aria-live="polite"
+                >
                   {result.msg}
                 </p>
               )}
@@ -410,3 +429,4 @@ export default function Home() {
     </div>
   );
 }
+
