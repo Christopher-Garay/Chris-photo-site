@@ -1,9 +1,13 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
 
+// ----------------------------
+// Types & Data
+// ----------------------------
 type Photo = { src: string; w: number; h: number; title: string };
 
 const PHOTOS: Photo[] = [
@@ -15,22 +19,81 @@ const PHOTOS: Photo[] = [
   { src: "/images/06.jpg", w: 1600, h: 1067, title: "Lines & light" },
   { src: "/images/07.jpg", w: 1600, h: 1067, title: "Still water" },
   { src: "/images/08.jpg", w: 1600, h: 1067, title: "Open road" },
-  { src: "/images/09.jpg", w: 1600, h: 1067, title: "City hush" }
+  { src: "/images/09.jpg", w: 1600, h: 1067, title: "City hush" },
 ];
 
+// ----------------------------
+// Hooks: Theme & Scroll Lock
+// ----------------------------
+function useDarkMode() {
+  const [dark, setDark] = useState(false);
+
+  // Initialize from localStorage or system preference
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+    if (saved === "dark") setDark(true);
+    else if (saved === "light") setDark(false);
+    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) setDark(true);
+  }, []);
+
+  // Apply to <html> and persist
+  useEffect(() => {
+    const el = document.documentElement;
+    if (dark) el.classList.add("dark");
+    else el.classList.remove("dark");
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {}
+  }, [dark]);
+
+  return { dark, setDark } as const;
+}
+
+function useScrollLock(locked: boolean) {
+  useEffect(() => {
+    if (!locked) return;
+    const { body } = document;
+    const original = body.style.overflow;
+    body.style.overflow = "hidden";
+    return () => {
+      body.style.overflow = original;
+    };
+  }, [locked]);
+}
+
 export default function Home() {
-  const [dark, setDark] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
-  const [active, setActive] = useState<number>(0);
+  const { dark, setDark } = useDarkMode();
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+
+  useScrollLock(open);
+
+  const activePhoto = useMemo(() => PHOTOS[active], [active]);
+
+  const closeLightbox = useCallback(() => setOpen(false), []);
+  const prev = useCallback(() => setActive((a) => (a - 1 + PHOTOS.length) % PHOTOS.length), []);
+  const next = useCallback(() => setActive((a) => (a + 1) % PHOTOS.length), []);
+
+  // Keyboard controls for the lightbox
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, closeLightbox, prev, next]);
 
   return (
-    <div className={dark ? "dark" : ""}>
+    <div>
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur border-b border-zinc-200 dark:border-zinc-800 supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-zinc-900/70">
+      <header className="sticky top-0 z-40 backdrop-blur border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-zinc-900/70">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 font-semibold tracking-tight">
+          <Link href="/" aria-label="Home" className="flex items-center gap-3 font-semibold tracking-tight">
             <Image
-              src="/brand/logo-white.png"
+              src="/brand/logo-white.png" // must exist at public/brand/logo-white.png
               alt="Christopher Garay Logo"
               width={140}
               height={32}
@@ -39,19 +102,20 @@ export default function Home() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link href="#work" className="hover:opacity-70">Work</Link>
-            <Link href="#about" className="hover:opacity-70">About</Link>
-            <Link href="#services" className="hover:opacity-70">Services</Link>
-            <Link href="#contact" className="hover:opacity-70">Contact</Link>
+            <Link href="#work" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-400 rounded">Work</Link>
+            <Link href="#about" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-400 rounded">About</Link>
+            <Link href="#services" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-400 rounded">Services</Link>
+            <Link href="#contact" className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-zinc-400 rounded">Contact</Link>
           </nav>
 
           <div className="flex items-center gap-3">
             <button
-              aria-label="Theme"
-              onClick={() => setDark(v => !v)}
-              className="rounded-full p-2 border border-zinc-200 dark:border-zinc-800"
+              aria-label="Toggle theme"
+              onClick={() => setDark((v) => !v)}
+              className="rounded-full p-2 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              type="button"
             >
-              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {dark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
             </button>
             <Link
               href="#contact"
@@ -92,10 +156,15 @@ export default function Home() {
             <div className="aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800">
               <Image
                 src={PHOTOS[0].src}
-                alt="Hero"
+                alt={PHOTOS[0].title}
                 width={PHOTOS[0].w}
                 height={PHOTOS[0].h}
+                sizes="(min-width: 1024px) 600px, (min-width: 768px) 50vw, 100vw"
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.opacity = "0.4";
+                }}
+                priority
               />
             </div>
           </div>
@@ -110,15 +179,21 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {PHOTOS.map((p, i) => (
               <button
-                key={i}
-                className="group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800"
-                onClick={() => { setActive(i); setOpen(true); }}
+                key={p.src}
+                className="group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                onClick={() => {
+                  setActive(i);
+                  setOpen(true);
+                }}
+                type="button"
+                aria-label={`Open ${p.title}`}
               >
                 <Image
                   src={p.src}
                   alt={p.title}
                   width={p.w}
                   height={p.h}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
@@ -152,7 +227,10 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4">
               <h3 className="font-medium mb-2">Based in</h3>
-              <p className="text-sm flex items-center gap-2"><MapPin className="h-4 w-4" />Monterey, CA • Available worldwide</p>
+              <p className="text-sm flex items-center gap-2">
+                <MapPin className="h-4 w-4" aria-hidden />
+                Monterey, CA • Available worldwide
+              </p>
               <h3 className="font-medium mt-4 mb-2">Specialties</h3>
               <ul className="text-sm list-disc ml-5 space-y-1">
                 <li>Couples and Portraits</li>
@@ -170,18 +248,21 @@ export default function Home() {
             {[
               {
                 name: "Portrait Sessions",
-                desc: "Perfect for individuals who want to capture their true self — whether it’s for personal branding, a milestone, or just because. We’ll take the time to find your best angles, your best light, and the mood that feels authentically you."
+                desc:
+                  "Perfect for individuals who want to capture their true self — whether it’s for personal branding, a milestone, or just because. We’ll find your best angles, best light, and the mood that feels authentically you.",
               },
               {
                 name: "Couples & Engagement",
-                desc: "Celebrate your connection with photos that feel genuine and unposed. I’ll guide you when you need it, but mostly I’ll capture those little glances, laughs, and moments that make your relationship yours."
+                desc:
+                  "Celebrate your connection with photos that feel genuine and unposed. I’ll guide you when needed, but mostly I’ll catch the laughs and little glances that make your relationship yours.",
               },
               {
                 name: "Brand & Editorial",
-                desc: "For businesses, creatives, and entrepreneurs who want visuals that stand out. We’ll create images that reflect your style and story, so your audience connects with you at first glance."
-              }
-            ].map((s, i) => (
-              <div key={i} className="rounded-3xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
+                desc:
+                  "For businesses, creatives, and entrepreneurs who want visuals that stand out. We’ll create images that reflect your style and story so your audience connects instantly.",
+              },
+            ].map((s) => (
+              <div key={s.name} className="rounded-3xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
                 <h3 className="font-semibold">{s.name}</h3>
                 <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{s.desc}</p>
                 <Link href="#contact" className="inline-block mt-4 text-sm underline underline-offset-4">Inquire</Link>
@@ -196,9 +277,21 @@ export default function Home() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl md:text-3xl font-semibold">Let’s make something you will want to frame</h2>
               <div className="hidden sm:flex gap-3">
-                <a href="mailto:hello@example.com" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"><Mail className="h-4 w-4" /></a>
-                <a href="https://instagram.com/yourhandle" target="_blank" rel="noreferrer" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"><Instagram className="h-4 w-4" /></a>
-                <a href="tel:+15555551234" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"><Smartphone className="h-4 w-4" /></a>
+                <a href="mailto:hello@example.com" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800" aria-label="Email">
+                  <Mail className="h-4 w-4" aria-hidden />
+                </a>
+                <a
+                  href="https://instagram.com/yourhandle"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-4 w-4" aria-hidden />
+                </a>
+                <a href="tel:+15555551234" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800" aria-label="Phone">
+                  <Smartphone className="h-4 w-4" aria-hidden />
+                </a>
               </div>
             </div>
             <form onSubmit={(e) => e.preventDefault()} className="grid md:grid-cols-3 gap-4">
@@ -208,7 +301,7 @@ export default function Home() {
               <textarea className="md:col-span-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" rows={4} placeholder="Share a bit about your vision, dates, and location." name="message" />
               <div className="md:col-span-3 flex items-center justify-between">
                 <p className="text-xs text-zinc-500">By submitting, you agree to be contacted by email.</p>
-                <button className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm">Send</button>
+                <button type="submit" className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm">Send</button>
               </div>
             </form>
           </div>
@@ -223,23 +316,48 @@ export default function Home() {
       {open && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setOpen(false)}
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Lightbox for ${activePhoto.title}`}
         >
           <div className="relative max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
             <Image
-              src={PHOTOS[active].src}
-              alt={PHOTOS[active].title}
-              width={PHOTOS[active].w}
-              height={PHOTOS[active].h}
+              src={activePhoto.src}
+              alt={activePhoto.title}
+              width={activePhoto.w}
+              height={activePhoto.h}
+              sizes="(min-width: 1024px) 960px, 100vw"
               className="w-full h-auto rounded-2xl"
+              priority
             />
-            <div className="absolute top-2 right-2">
-              <button onClick={() => setOpen(false)} className="rounded-full px-3 py-1 bg-white/90 text-zinc-900 text-xs">Close</button>
+
+            <div className="absolute top-2 right-2 flex gap-2">
+              <button
+                onClick={closeLightbox}
+                className="rounded-full px-3 py-1 bg-white/90 text-zinc-900 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                type="button"
+              >
+                Close
+              </button>
             </div>
-            <div className="absolute inset-x-0 -bottom-12 mx-auto w-full max-w-md flex items-center justify-between">
-              <button onClick={() => setActive((a) => (a - 1 + PHOTOS.length) % PHOTOS.length)} className="rounded-full px-4 py-2 bg-white/90 text-zinc-900 text-xs">Prev</button>
-              <span className="text-white text-xs opacity-80">{PHOTOS[active].title}</span>
-              <button onClick={() => setActive((a) => (a + 1) % PHOTOS.length)} className="rounded-full px-4 py-2 bg-white/90 text-zinc-900 text-xs">Next</button>
+
+            <div className="absolute inset-x-0 bottom-2 mx-auto w-full max-w-md flex items-center justify-between gap-2 px-2">
+              <button
+                onClick={prev}
+                className="rounded-full px-4 py-2 bg-white/90 text-zinc-900 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                type="button"
+              >
+                Prev
+              </button>
+              <span className="text-white text-xs opacity-90 line-clamp-1 text-center">{activePhoto.title}</span>
+              <button
+                onClick={next}
+                className="rounded-full px-4 py-2 bg-white/90 text-zinc-900 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                type="button"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
