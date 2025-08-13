@@ -4,16 +4,10 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, Instagram, Smartphone, MapPin, Moon, Sun } from "lucide-react";
-const IG_URL = "https://instagram.com/<crzgar717>";
-const FORMSPREE = "https://formspree.io/f/mjkoljga";
 
-const res = await fetch(FORMSPREE, {
-  method: "POST",
-  headers: { Accept: "application/json" },
-  body: data,
-});
-
-
+// External links / services
+const IG_URL = "https://instagram.com/crzgar717"; // your Instagram
+const FORMSPREE = "https://formspree.io/f/mjkoljga"; // your Formspree endpoint
 
 // ----------------------------
 // Types & Data
@@ -72,37 +66,45 @@ function useScrollLock(locked: boolean) {
 }
 
 export default function Home() {
-const [sending, setSending] = useState(false);
-const [result, setResult] = useState(null);
+  // theme
+  const { dark, setDark } = useDarkMode();
 
-async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault(); // stops page from refreshing
-  setSending(true);
-  setResult(null);
+  // gallery
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
 
-  const form = e.currentTarget;
-  const data = new FormData(form);
+  // contact form
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<null | { ok: boolean; msg: string }>(null);
 
-  try {
-    const res = await fetch("https://formspree.io/f/mjkoljga", {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: data,
-    });
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSending(true);
+    setResult(null);
 
-    if (res.ok) {
-      form.reset();
-      setResult({ ok: true, msg: "Thanks! I’ll get back to you soon." });
-    } else {
-      setResult({ ok: false, msg: "Something went wrong. Try again." });
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(FORMSPREE, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: data,
+      });
+
+      if (res.ok) {
+        form.reset();
+        setResult({ ok: true, msg: "Thanks! I’ll get back to you soon." });
+      } else {
+        const json = await res.json().catch(() => ({}));
+        setResult({ ok: false, msg: json?.errors?.[0]?.message || "Something went wrong. Try again." });
+      }
+    } catch {
+      setResult({ ok: false, msg: "Network error. Try again." });
+    } finally {
+      setSending(false);
     }
-  } catch {
-    setResult({ ok: false, msg: "Network error. Try again." });
-  } finally {
-    setSending(false);
   }
-}
-
 
   useScrollLock(open);
 
@@ -131,7 +133,7 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <Link href="/" aria-label="Home" className="flex items-center gap-3 font-semibold tracking-tight">
             <Image
-              src="/brand/logo-white.png" // must exist at public/brand/logo-white.png
+              src="/brand/logo-white.png"
               alt="Christopher Garay Logo"
               width={140}
               height={32}
@@ -319,39 +321,33 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
                   <Mail className="h-4 w-4" aria-hidden />
                 </a>
                 <a
-  href={IG_URL}
-  target="_blank"
-  rel="noreferrer noopener"
-  className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"
-  aria-label="Instagram"
->
-  <Instagram className="h-4 w-4" aria-hidden />
-</a>
-
+                  href={IG_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-4 w-4" aria-hidden />
+                </a>
                 <a href="tel:+15555551234" className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800" aria-label="Phone">
                   <Smartphone className="h-4 w-4" aria-hidden />
                 </a>
               </div>
             </div>
             <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-4">
-              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Your name" name="name" />
-              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Email" name="email" />
-              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="What are you looking for?" name="subject" />
-              <textarea className="md:col-span-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" rows={4} placeholder="Share a bit about your vision, dates, and location." name="message" />
+              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Your name" name="name" required />
+              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="Email" name="email" type="email" required />
+              <input className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" placeholder="What are you looking for?" name="subject" required />
+              <textarea className="md:col-span-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2" rows={4} placeholder="Share a bit about your vision, dates, and location." name="message" required />
               <div className="md:col-span-3 flex items-center justify-between">
                 <p className="text-xs text-zinc-500">By submitting, you agree to be contacted by email.</p>
-                <button type="submit" className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm">Send</button>
+                <button type="submit" disabled={sending} className="rounded-2xl px-4 py-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-sm disabled:opacity-60">{sending ? "Sending..." : "Send"}</button>
               </div>
               {result && (
-  <p
-    className={`md:col-span-3 text-sm ${
-      result.ok ? "text-green-600" : "text-red-600"
-    }`}
-  >
-    {result.msg}
-  </p>
-)}
-
+                <p className={`md:col-span-3 text-sm ${result.ok ? "text-green-600" : "text-red-600"}`} role="status">
+                  {result.msg}
+                </p>
+              )}
             </form>
           </div>
         </section>
