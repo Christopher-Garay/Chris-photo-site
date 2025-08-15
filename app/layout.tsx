@@ -11,11 +11,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 // app/layout.tsx
 export const metadata = {
   metadataBase: new URL("https://www.lightandgaray.com"), // change this
-  title: "Chris Garcia Photography",
+  title: "Chris Garay Photography",
   description: "Clean, natural light photography with an airy feel.",
   alternates: { canonical: "https://lightandgaray.com" },
   openGraph: {
-    title: "Chris Garcia Photography",
+    title: "Chris Garay Photography",
     description: "Clean, natural light photography with an airy feel.",
     url: "https://yourdomain.com",
     siteName: "Chris Garcia Photography",
