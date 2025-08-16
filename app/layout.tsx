@@ -18,7 +18,7 @@ export const metadata = {
     title: "Chris Garay Photography",
     description: "Clean, natural light photography with an airy feel.",
     url: "https://yourdomain.com",
-    siteName: "Chris Garcia Photography",
+    siteName: "Chris Garay Photography",
     images: ["/l&g-logo.jpg"], // drop a real image in /public
     type: "website",
   },
