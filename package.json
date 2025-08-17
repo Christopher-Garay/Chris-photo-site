@@ -9,7 +9,7 @@
     "lint": "next lint",
     "build:manifest": "node scripts/buildGalleryManifest.mjs",
     "predev": "npm run build:manifest",
-"prebuild": "npm run build:manifest"
+    "prebuild": "npm run build:manifest"
 
   },
   "dependencies": {
