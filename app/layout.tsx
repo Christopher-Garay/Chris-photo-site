@@ -1,4 +1,3 @@
-cat > app/layout.tsx <<'EOF'
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -34,4 +33,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   );
 }
-EOF
+
