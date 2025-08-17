@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import Link from "next/link";
-import { ThemeToggle } from "../components/ThemeToggle";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 export const metadata = {
   title: "Photography | Portfolio",

@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "build:manifest": "node scripts/buildGalleryManifest.mjs",
     "predev": "npm run build:manifest",
     "prebuild": "npm run build:manifest"
