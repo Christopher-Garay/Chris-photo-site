@@ -1,4 +1,4 @@
-// FILE: styles/globals.css
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -54,7 +54,6 @@
   .surface-veil{ background-color: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 }
 
-  
 
 /* Optional: reduce motion respects */
 @media (prefers-reduced-motion: reduce){
