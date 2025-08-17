@@ -2,7 +2,6 @@ import "../styles/globals.css";
 import Link from "next/link";
 import { ThemeToggle } from "../components/ThemeToggle";
 
-
 export const metadata = {
   title: "Photography | Portfolio",
   description: "Work I'm proud of. Filter to jump to what you want to see.",
