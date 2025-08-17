@@ -1,5 +1,4 @@
 // FILE: lib/galleryData.ts
-import { generatedGalleries } from "./galleries.manifest";
 export type CategoryKey = "people" | "landscapes" | "animals";
 export const categories: Record<CategoryKey, string> = {
   people: "People",
@@ -24,6 +23,6 @@ export type GalleryMeta = {
 
 export type Gallery = GalleryMeta & { images: ImageMeta[]; description?: string };
 
-export const galleries: Gallery[] = generatedGalleries as unknown as Gallery[];
-
+import { generatedGalleries } from "./galleries.manifest";
+export const galleries: Gallery[] = (generatedGalleries as unknown as Gallery[]);
 export const galleriesBySlug = new Map(galleries.map(g => [g.slug, g] as const));

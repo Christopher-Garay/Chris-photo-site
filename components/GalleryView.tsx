@@ -1,10 +1,8 @@
-// FILE: components/GalleryView.tsx
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useCallback, useEffect } from "react";
 import { type Gallery } from "../lib/galleryData";
-import Link from "next/link";
-
 
 export function GalleryView({ gallery }: { gallery: Gallery }) {
   const [index, setIndex] = useState<number | null>(null);
@@ -27,17 +25,11 @@ export function GalleryView({ gallery }: { gallery: Gallery }) {
 
   return (
     <section className="space-y-6">
+      <Link href="/portfolio" className="inline-flex items-center gap-1 text-sm text-textMuted hover:opacity-80">← Back to portfolio</Link>
       <header className="space-y-1">
         <h1 className="text-3xl font-bold tracking-wide">{gallery.title}</h1>
         <p className="text-textMuted">{gallery.location} · {new Date(gallery.date).toLocaleDateString()}</p>
         {gallery.description && <p className="max-w-prose">{gallery.description}</p>}
-        <Link
-  href="/portfolio"
-  className="inline-flex items-center gap-1 text-sm text-textMuted hover:opacity-80"
->
-  ← Back to portfolio
-</Link>
-
       </header>
       <ul className="masonry grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         {gallery.images.map((img, i) => (

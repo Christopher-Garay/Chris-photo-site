@@ -51,14 +51,35 @@
   .ring-accent{ --tw-ring-color: var(--accent); }
   .ring-offset-bg{ --tw-ring-offset-color: var(--bg); }
   .bg-overlay{ background-color:var(--overlay); }
-    .surface-veil{
-    background-color: color-mix(in srgb, var(--surface) 92%, transparent);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
+  .surface-veil{ background-color: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 }
+
+  
 
 /* Optional: reduce motion respects */
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
 }
+
+// FILE: tailwind.config.ts (snippet)
+// Ensure you use 'class' strategy for dark mode
+export default {
+  darkMode: 'class',
+  content: [
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}',
+  ],
+  theme: { extend: {} },
+  plugins: [],
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Notes
+// - Place demo images in /public/demo/*.jpg or swap with your real assets.
+// - Routes included: /, /portfolio, /portfolio/[slug]
+// - Lightbox supports ESC, ←, →. Clicking backdrop closes. Focus styles included.
+// - Theme persists in localStorage ('light' | 'dark' | 'system').
+// - All colors reference tokens so dark mode inherits automatically.
+// - Next step (Week 1, part 2): add JSON‑LD & preload hero images per gallery.
+// ──────────────────────────────────────────────────────────────────────────────
